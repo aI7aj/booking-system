@@ -60,8 +60,22 @@ export const confirmEmail = async ({ email, code }) => {
     }
     if (user.code !== code) {
         throw new AppError("invalid confirmation code", 400);
-  
+
     }
     await authQuery.confirmEmail(email, code);
     return true;
 };
+
+export const resendCode = async ({ email }) => {
+    const user = await authQuery.findUserByEmail(email);
+    if (!user) {
+        throw new AppError("no account found with this email", 404);
+    }
+    if (user.isConfirmed) {
+        throw new AppError("email is already confirmed", 400);
+    }
+    const code = user.code || generateCode();
+    await authQuery.updateUserCode(email, code);
+    await sendSysEmail("CONFIRMATION", email, code);
+    return true;
+}

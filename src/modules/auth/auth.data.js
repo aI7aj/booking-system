@@ -1,3 +1,4 @@
+import { where } from "sequelize";
 import User from "../../../Database/models/user.model.js";
 
 export const findUserByEmail = async (email) => {
@@ -16,4 +17,11 @@ export const confirmEmail = async (email, code) => {
     }, {
         where: { email, code }
     });
-};   
+};
+
+export const updateUserCode = async (email, code) => {
+    await User.update(
+        { code }, {
+            where: { email }
+    })
+};
