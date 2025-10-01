@@ -6,12 +6,11 @@ export const findUserByEmail = async (email) => {
 };
 
 export const createUser = async (data) => {
-    const user = await User.create(data);
-    return user;
+    return await User.create(data);;
 };
 
 export const confirmEmail = async (email, code) => {
-    await User.update({
+    return await User.update({
         isConfirmed: true,
         code: null
     }, {
@@ -20,8 +19,18 @@ export const confirmEmail = async (email, code) => {
 };
 
 export const updateUserCode = async (email, code) => {
-    await User.update(
+    return await User.update(
         { code }, {
-            where: { email }
+        where: { email }
+    })
+};
+
+export const updatePassword = async (email, password, code) => {
+    return await User.update(
+        {
+            password,
+            code: null
+        }, {
+        where: { email, code }
     })
 };

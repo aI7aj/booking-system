@@ -15,7 +15,9 @@ router.post("/confirm", asyncHandler(controller.confirmEmail));
 // POST   /auth/resend-code    --> Resend email confirmation code (optional)
 router.post("/resend-code", asyncHandler(controller.resendCode));
 // POST   /auth/forgot-password --> Send reset code to email (💡 Bonus)
+router.post("/forgot-password", asyncHandler(controller.forgotPassword));
 // POST   /auth/reset-password  --> Reset password using code (💡 Bonus)
+router.post("/reset-password", asyncHandler(controller.resetPassword))
 
 
 export default router;

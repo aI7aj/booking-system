@@ -79,3 +79,28 @@ export const resendCode = async ({ email }) => {
     await sendSysEmail("CONFIRMATION", email, code);
     return true;
 }
+
+export const forgotPassword = async ({ email }) => {
+    const user = await authQuery.findUserByEmail(email);
+    if (!user) {
+        throw new AppError("no account found with this email", 404);
+    }
+    const code = user.code || generateCode();
+    await authQuery.updateUserCode(email,code);
+    await sendSysEmail("RESET", email, code);
+    return true;
+
+};
+
+export const resetPassword = async({email,password ,code}) => {
+    const user = await authQuery.findUserByEmail(email);
+    if(!user) {
+        throw new AppError("no account found with this email", 404);
+    }
+    if(user.code !== code){
+        throw new AppError("invalid reset code");
+    }
+    await authQuery.updatePassword(email,password,code);
+    await sendSysEmail("PASS_RESET_SUCCESS", email);
+    return true;
+};

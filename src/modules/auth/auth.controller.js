@@ -45,5 +45,27 @@ export const resendCode = async (req, res, next) => {
     } catch (err) {
         next(err);
     }
+};
 
+export const forgotPassword = async (req,res,next) =>{
+    try {
+        await authService.forgotPassword(req.body);
+        res.status(200).json({
+            msg : "a reset code has been sent to your email, check it out!"
+        });
+    }
+    catch(err){
+        next(err);
+    }
+};
+export const resetPassword = async (req,res,next) =>{
+    try {
+        await authService.resetPassword(req.body);
+        res.status(200).json({
+            msg : "your password has been successfully reseted!"
+        });
+    }
+    catch (err){
+        next(err);
+    }
 }
