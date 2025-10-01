@@ -8,3 +8,12 @@ export const createUser = async (data) => {
     const user = await User.create(data);
     return user;
 };
+
+export const confirmEmail = async (email, code) => {
+    await User.update({
+        isConfirmed: true,
+        code: null
+    }, {
+        where: { email, code }
+    });
+};   

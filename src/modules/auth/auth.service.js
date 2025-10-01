@@ -3,7 +3,7 @@ import * as hashing from "../../utils/hashing/hash.js";
 import generateCode from "../../utils/generateCode.js";
 import { AppError } from "../../utils/AppError.js";
 import { sendSysEmail } from "../../utils/email/sendEmail.js";
-
+import { generateToken } from "../../utils/jwt/generateToken.js";
 
 
 export const register = async ({ name, email, password, role = "user" }) => {
@@ -29,4 +29,39 @@ export const register = async ({ name, email, password, role = "user" }) => {
         name: user.name,
         email: user.email,
     }
+};
+
+export const login = async ({ email, password }) => {
+    const user = await authQuery.findUserByEmail(email);
+    if (!user) {
+        throw new AppError("invalid credentials", 401);
+    }
+    if (!user.isConfirmed) {
+        throw new AppError("please confirm your email before logging in", 401);
+    }
+    const isMatch = await hashing.passwordCompare(password, user.password);
+    if (!isMatch) {
+        throw new AppError("invalid credentials", 401);
+    }
+
+    const token = generateToken({ id: user.id, email: user.email });
+
+    return { user, token };
+
+}
+
+export const confirmEmail = async ({ email, code }) => {
+    const user = await authQuery.findUserByEmail(email);
+    if (!user) {
+        throw new AppError("no account found with this email", 404);
+    }
+    if (user.isConfirmed) {
+        throw new AppError("email is already confirmed", 400);
+    }
+    if (user.code !== code) {
+        throw new AppError("invalid confirmation code", 400);
+  
+    }
+    await authQuery.confirmEmail(email, code);
+    return true;
 };
