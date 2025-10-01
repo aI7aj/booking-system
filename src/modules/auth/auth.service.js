@@ -100,11 +100,14 @@ export const resetPassword = async({email,password ,code}) => {
     if(user.code !== code){
         throw new AppError("invalid reset code or it has expired", 400);
     }
-    const hashedPasword = await hashing.passwordHash(password);
-    if(user.password === hashedPasword){
+    const isMatch = await hashing.passwordCompare(password, user.password);
+
+    if(isMatch) {
         throw new AppError("new password must be different from the old one", 400);
     }
-    await authQuery.updatePassword(email,password,code);
+    const hashedPasword = await hashing.passwordHash(password);
+
+    await authQuery.updatePassword(email,hashedPasword,code);
     await sendSysEmail("PASS_RESET_SUCCESS", email);
     return true;
 };
