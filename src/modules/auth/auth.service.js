@@ -86,28 +86,28 @@ export const forgotPassword = async ({ email }) => {
         throw new AppError("no account found with this email", 404);
     }
     const code = user.code || generateCode();
-    await authQuery.updateUserCode(email,code);
+    await authQuery.updateUserCode(email, code);
     await sendSysEmail("RESET", email, code);
     return true;
 
 };
 
-export const resetPassword = async({email,password ,code}) => {
+export const resetPassword = async ({ email, password, code }) => {
     const user = await authQuery.findUserByEmail(email);
-    if(!user) {
+    if (!user) {
         throw new AppError("no account found with this email", 404);
     }
-    if(user.code !== code){
+    if (user.code !== code) {
         throw new AppError("invalid reset code or it has expired", 400);
     }
     const isMatch = await hashing.passwordCompare(password, user.password);
 
-    if(isMatch) {
+    if (isMatch) {
         throw new AppError("new password must be different from the old one", 400);
     }
     const hashedPasword = await hashing.passwordHash(password);
 
-    await authQuery.updatePassword(email,hashedPasword,code);
+    await authQuery.updatePassword(email, hashedPasword, code);
     await sendSysEmail("PASS_RESET_SUCCESS", email);
     return true;
 };
