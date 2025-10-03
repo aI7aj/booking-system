@@ -6,7 +6,7 @@ import asyncHandler from "../../utils/asyncHandler.js";
 const router = Router();
 
 // POST   /auth/register       --> Register a new user
-router.post("/register", asyncHandler(controller.register));Í
+router.post("/register", asyncHandler(controller.register));
 // POST   /auth/login          --> Login and get a JWT token
 router.post("/login", asyncHandler(controller.login));
 // POST   /auth/confirm        --> Confirm email
