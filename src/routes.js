@@ -9,7 +9,7 @@ export function init(express, app) {
 
 
   app.use("/auth", authRouter);          // Auth routes for login/register/confirm email
-   app.use("/users", userRouter);          // User management routes
+  app.use("/users", userRouter);          // User management routes
   // app.use("/bookings", bookingRouter);    // Booking system routes
 
   // TODO: Uncomment the global error handler middleware after implementing it

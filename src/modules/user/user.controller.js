@@ -5,7 +5,7 @@ export const getUsers = async (req, res, next) => {
         const result = await userService.getUsers();
         res.status(200).json({
             msg: result.length + " users returned successfully",
-            users: result 
+            users: result
         });
     }
     catch (err) {
@@ -13,7 +13,7 @@ export const getUsers = async (req, res, next) => {
     }
 };
 
-export const getUserById = async(req,res, next)=> {
+export const getUserById = async (req, res, next) => {
     try {
         const result = await userService.getUserById(req.params.id);
         res.status(200).json({
@@ -21,8 +21,23 @@ export const getUserById = async(req,res, next)=> {
             user: result
         });
     }
-    catch(err){
+    catch (err) {
         next(err);
     }
 
+};
+
+export const updateUser = async (req, res, next) => {
+    try {
+        const data = req.body;
+        const targetID = req.params.id;
+        const result = await userService.updateUser(req.user, targetID, data);
+        res.status(200).json({
+            msg: "user updated",
+            user: result
+        })
+    }
+    catch (err) {
+        next(err);
+    }
 };

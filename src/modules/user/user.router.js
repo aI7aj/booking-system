@@ -17,8 +17,10 @@ router.get("/:id",
     asyncHandler(controller.getUserById));
 
 // PUT    /users/:id         --> [ADMIN or USER] Update user
-// router.put("/:id",
-//     asyncHandler(controller.updateUser));
+router.put("/:id",
+    authMiddlware.authenticateJWT([ROLES.ADMIN, ROLES.USER]),
+    authMiddlware.allowSelfOrRole([ROLES.ADMIN]),
+    asyncHandler(controller.updateUser));
 
 // DELETE /users/:id         --> [ADMIN ONLY] Delete user
 
