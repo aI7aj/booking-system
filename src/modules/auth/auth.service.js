@@ -39,6 +39,9 @@ export const login = async ({ email, password }) => {
     if (!user.isConfirmed) {
         throw new AppError("please confirm your email before logging in", 401);
     }
+    if (user.status === "inactive") {
+        throw new AppError("your account is disabled, for more information contact support: support@al7aj.com", 403);
+    }
     const isMatch = await hashing.passwordCompare(password, user.password);
     if (!isMatch) {
         throw new AppError("invalid credentials", 401);
