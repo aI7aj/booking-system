@@ -23,6 +23,8 @@ router.put("/:id",
     asyncHandler(controller.updateUser));
 
 // DELETE /users/:id         --> [ADMIN ONLY] Delete user
-
+router.delete("/:id",
+    authMiddlware.authenticateJWT([ROLES.ADMIN]),
+    asyncHandler(controller.deleteUser));
 
 export default router;

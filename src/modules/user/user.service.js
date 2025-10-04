@@ -57,3 +57,7 @@ export const updateUser = async (user, id, data) => {
 
     return await userData.updateUser(id, updateData);
 }
+
+export const deleteUser = async (id) => {
+    return await userData.deleteUser(id);
+}

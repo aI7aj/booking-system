@@ -21,3 +21,7 @@ export const updateUser = async (id, data) => {
     await User.update(data, { where: { id } });
     return await findUserByID(id);
 }; 
+
+export const deleteUser = async (id) => {
+    return await User.destroy({ where: { id } });
+};
