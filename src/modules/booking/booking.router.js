@@ -1,5 +1,16 @@
+import { Router } from 'express';
+import * as controller from "./booking.controller.js";
+import asyncHandler from "../../utils/asyncHandler.js";
+import * as authMiddleware from "../../middlewares/authMiddleware.js";
+import ROLES from "../../../Database/roles.js";
+const router = Router();
+
 // ===== Booking Routes =====
 // POST    /bookings              --> [USER] Create a new booking
+router.post("/",
+    authMiddleware.authenticateJWT([ROLES.USER]),
+    asyncHandler(controller.createBooking));
+
 // GET     /bookings              --> [ADMIN] Get all bookings with pagination
 // GET     /bookings/my           --> [USER] Get my bookings with pagination
 // GET     /bookings/:id          --> [ADMIN] Get booking by ID
@@ -12,3 +23,7 @@
 // 1. Fetch the user who owns the booking.
 // 2. Send them an email using the sendEmail utility.
 //    Example: "Your booking on [date] at [time] has been updated."
+
+
+
+export default router;

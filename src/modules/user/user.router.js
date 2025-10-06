@@ -3,6 +3,7 @@ import * as controller from "./user.controller.js";
 import asyncHandler from "../../utils/asyncHandler.js";
 import * as authMiddlware from "../../middlewares/authMiddleware.js";
 import ROLES from "../../../Database/roles.js";
+
 const router = Router();
 
 // ===== User Routes =====
