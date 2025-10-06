@@ -16,7 +16,7 @@ export const authenticateJWT = (allowedRoles = []) => {
                 return next(new AppError("user not found", 401));
             }
             if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
-                return next(new AppError("forbidden", 403));
+                return next(new AppError("forbidden, access denied", 403));
             }
             req.user = user;
             next();

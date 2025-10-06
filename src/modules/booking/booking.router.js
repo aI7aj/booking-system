@@ -12,7 +12,13 @@ router.post("/",
     asyncHandler(controller.createBooking));
 
 // GET     /bookings              --> [ADMIN] Get all bookings with pagination
+router.get("/",
+    authMiddleware.authenticateJWT([ROLES.ADMIN]),
+    asyncHandler(controller.getAllBookings)); // todo paginiation
 // GET     /bookings/my           --> [USER] Get my bookings with pagination
+router.get("/my",
+    authMiddleware.authenticateJWT([ROLES.USER]),
+    asyncHandler(controller.getMyBookings)); // todo paginiation
 // GET     /bookings/:id          --> [ADMIN] Get booking by ID
 // PUT     /bookings/:id          --> [ADMIN] Update booking
 // DELETE  /bookings/:id          --> [ADMIN] Delete booking

@@ -20,3 +20,11 @@ export const createBooking = async (user, data) => {
     };
     return await bookingQuery.createBooking(bookingData);
 };
+
+export const getAllBookings = async () => {
+    return await bookingQuery.findAllBookings();
+};
+
+export const getMyBookings = async (userId) => {
+    return await bookingQuery.findBookingsByUserID(userId);
+};
