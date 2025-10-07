@@ -50,6 +50,10 @@ export const getBookingByID = async (id) => {
 };
 
 export const updateBooking = async (id, data) => {
+    if (isNaN(id)) throw new AppError("Invalid booking id", 400);
+    if ("status" in data) {
+        throw new AppError("Status cannot be changed in this endpoint", 400);
+    }
     const currentBooking = await bookingQuery.findBookingByID(id);
     if (!currentBooking) {
         throw new AppError("Booking not found", 404);
@@ -81,9 +85,6 @@ export const updateBooking = async (id, data) => {
     catch (err) {
         console.error("Error sending email:", err);
     }
-
-
-
 };
 
 export const deleteBooking = async (id) => {

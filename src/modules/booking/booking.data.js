@@ -32,10 +32,6 @@ export const deleteBooking = async (id) => {
     return await Booking.destroy({ where: { id } });
 };
 
-export const changeBookingStatus = async (id, status) => {
-    return await updateBooking(id, { status });
-}
-
 export const findUserActiveBookings = async (user, date, time) => {
     return await Booking.findOne({ where: { userId: user, time, date, 
         status: {
