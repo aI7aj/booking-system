@@ -4,7 +4,6 @@ import * as emailTemplates from "./emailTemplates.js";
 
 export async function sendSysEmail(type, to, data) {
     let subject, html;
-    console.log("sendSysEmail called with:", { type, to, data });
     if (!to) {
         throw new AppError("Recipient email address is required", 400);
     }

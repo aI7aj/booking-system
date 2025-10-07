@@ -4,7 +4,6 @@ import { sendSysEmail } from "../../utils/email/sendEmail.js";
 import { findUserByID } from "../user/user.data.js";
 
 export const createBooking = async (user, data) => {
-    console.log(user, data);
     if (!user) {
         throw new AppError("Authentication required to create a booking", 401);
     }
@@ -14,14 +13,18 @@ export const createBooking = async (user, data) => {
     if (new Date(data.date) < new Date()) {
         throw new AppError("Booking date must be in the future", 400);
     }
+    const CheckConflict = await bookingQuery.findUserActiveBookings(user, data.date, data.time);
+    if (CheckConflict) {
+        throw new AppError("You already have an active or pending booking in that time", 400);
+    }
     const bookingData = {
         userId: user,
         date: data.date,
         time: data.time,
     };
-    const userFetched = await findUserByID(user);
 
-    console.log(userFetched.email);
+
+    const userFetched = await findUserByID(user);
     if (!userFetched.email) {
         throw new AppError("User email not found", 404);
     }
@@ -47,13 +50,40 @@ export const getBookingByID = async (id) => {
 };
 
 export const updateBooking = async (id, data) => {
-    const res = await bookingQuery.updateBooking(id, data);
-    if (!res) {
+    const currentBooking = await bookingQuery.findBookingByID(id);
+    if (!currentBooking) {
         throw new AppError("Booking not found", 404);
     }
-    const dataTosend = { id: res.id, date: res.date, time: res.time, status: res.status };
-    const userFetched = await findUserByID(res.userId);
-    await sendSysEmail("BOOKING_UPDATED", userFetched.email, dataTosend);
+    const newDate = data.date ?? currentBooking.date;
+    const newTime = data.time ?? currentBooking.time;
+
+    const isDateChanged = Object.prototype.hasOwnProperty.call(data, "date") && data.date !== currentBooking.date;
+    const isTimeChanged = Object.prototype.hasOwnProperty.call(data, "time") && data.time !== currentBooking.time;
+
+    if (!(isDateChanged || isTimeChanged)) {
+        throw new AppError("No changes detected in date or time", 400);
+    }
+    if (isDateChanged || isTimeChanged) {
+        const CheckConflict = await bookingQuery.findUserActiveBookings(currentBooking.userId, newDate, newTime);
+        if (CheckConflict) {
+            throw new AppError("You already have an active or pending booking in that time", 400);
+        }
+    }
+
+    const res = await bookingQuery.updateBooking(id, data);
+    try {
+        const userFetched = await findUserByID(res.userId);
+        if (userFetched?.email) {
+            const dataTosend = { id: res.id, date: res.date, time: res.time, status: res.status };
+            await sendSysEmail("BOOKING_UPDATED", userFetched.email, dataTosend);
+        }
+    }
+    catch (err) {
+        console.error("Error sending email:", err);
+    }
+
+
+
 };
 
 export const deleteBooking = async (id) => {
@@ -77,12 +107,14 @@ export const changeBookingStatus = async (id, status) => {
         throw new AppError(`Booking is already ${status}`, 400);
     }
     const updatedBooking = await bookingQuery.updateBooking(id, { status });
-    if (!updatedBooking) {
-        throw new AppError("Booking not found", 404);
+    try {
+        const userFetched = await findUserByID(updatedBooking.userId);
+        if (userFetched?.email) {
+            const dataTosend = { id: updatedBooking.id, date: updatedBooking.date, time: updatedBooking.time, status: updatedBooking.status };
+            await sendSysEmail("BOOKING_UPDATED", userFetched.email, dataTosend);
+        }
+    } catch (error) {
+        console.error("Error sending email:", error);
     }
-
-    const dataTosend = { id: updatedBooking.id, date: updatedBooking.date, time: updatedBooking.time, status: updatedBooking.status };
-    const userFetched = await findUserByID(updatedBooking.userId);
-    await sendSysEmail("BOOKING_UPDATED", userFetched.email, dataTosend);
     return updatedBooking;
 };

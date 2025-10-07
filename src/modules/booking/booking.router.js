@@ -36,11 +36,6 @@ router.patch("/:id/status",
     authMiddleware.authenticateJWT([ROLES.ADMIN]),
     asyncHandler(controller.changeBookingStatus));
 
-// NOTE:
-// If the ADMIN updates a booking, don't forget to:
-// 1. Fetch the user who owns the booking.
-// 2. Send them an email using the sendEmail utility.
-//    Example: "Your booking on [date] at [time] has been updated."
 
 
 

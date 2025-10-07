@@ -1,4 +1,5 @@
 import Booking from "../../../Database/models/booking.model.js";
+import { Op } from "sequelize";
 
 export const createBooking = async (data) => {
     return await Booking.create(data);
@@ -34,3 +35,11 @@ export const deleteBooking = async (id) => {
 export const changeBookingStatus = async (id, status) => {
     return await updateBooking(id, { status });
 }
+
+export const findUserActiveBookings = async (user, date, time) => {
+    return await Booking.findOne({ where: { userId: user, time, date, 
+        status: {
+        [Op.in]: ["active", "pending"]  
+      }
+    } });
+};
