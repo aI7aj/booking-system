@@ -17,3 +17,20 @@ export const findAllBookings = async () => {
 export const findBookingsByUserID = async (userId) => {
     return await Booking.findAll({ where: { userId } });
 };  
+
+export const findBookingByID = async (id) => {
+    return await Booking.findOne({ where: { id } });
+}
+
+export const updateBooking = async (id, data) => {
+  await Booking.update(data, { where: { id } });
+  return await findBookingByID(id);
+};
+
+export const deleteBooking = async (id) => {
+    return await Booking.destroy({ where: { id } });
+};
+
+export const changeBookingStatus = async (id, status) => {
+    return await updateBooking(id, { status });
+}

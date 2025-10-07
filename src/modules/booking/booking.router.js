@@ -20,9 +20,21 @@ router.get("/my",
     authMiddleware.authenticateJWT([ROLES.USER]),
     asyncHandler(controller.getMyBookings)); // todo paginiation
 // GET     /bookings/:id          --> [ADMIN] Get booking by ID
+router.get("/:id",
+    authMiddleware.authenticateJWT([ROLES.ADMIN]),
+    asyncHandler(controller.getBookingByID));
 // PUT     /bookings/:id          --> [ADMIN] Update booking
+router.put("/:id",
+    authMiddleware.authenticateJWT([ROLES.ADMIN]),
+    asyncHandler(controller.updateBooking));
 // DELETE  /bookings/:id          --> [ADMIN] Delete booking
+router.delete("/:id",
+    authMiddleware.authenticateJWT([ROLES.ADMIN]),
+    asyncHandler(controller.deleteBooking));
 // PATCH   /bookings/:id/status   --> [ADMIN] Change status of a booking (e.g., confirm/cancel)
+router.patch("/:id/status",
+    authMiddleware.authenticateJWT([ROLES.ADMIN]),
+    asyncHandler(controller.changeBookingStatus));
 
 // NOTE:
 // If the ADMIN updates a booking, don't forget to:
