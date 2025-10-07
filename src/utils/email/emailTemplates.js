@@ -140,9 +140,6 @@ export const NEW_BOOKING_TEMPLATE = `
 </html>
 `;
 
-
-
-
 export const UPDATE_BOOKING_TEMPLATE = `
 <!DOCTYPE html>
 <html lang="en">

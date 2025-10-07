@@ -69,10 +69,18 @@ export const changeBookingStatus = async (id, status) => {
     if (!validStatuses.includes(status)) {
         throw new AppError("Invalid status value", 400);
     }
+    const currentBooking = await bookingQuery.findBookingByID(id);
+    if (!currentBooking) {
+        throw new AppError("Booking not found", 404);
+    }
+    if (currentBooking.status === status) {
+        throw new AppError(`Booking is already ${status}`, 400);
+    }
     const updatedBooking = await bookingQuery.updateBooking(id, { status });
     if (!updatedBooking) {
         throw new AppError("Booking not found", 404);
     }
+
     const dataTosend = { id: updatedBooking.id, date: updatedBooking.date, time: updatedBooking.time, status: updatedBooking.status };
     const userFetched = await findUserByID(updatedBooking.userId);
     await sendSysEmail("BOOKING_UPDATED", userFetched.email, dataTosend);
