@@ -1,6 +1,7 @@
 import * as bookingQuery from "./booking.data.js";
 import { AppError } from '../../utils/AppError.js';
-
+import { sendSysEmail } from "../../utils/email/sendEmail.js";
+import { findUserByID } from "../user/user.data.js";
 
 export const createBooking = async (user, data) => {
     console.log(user, data);
@@ -18,7 +19,15 @@ export const createBooking = async (user, data) => {
         date: data.date,
         time: data.time,
     };
-    return await bookingQuery.createBooking(bookingData);
+    const userFetched = await findUserByID(user);
+
+    console.log(userFetched.email);
+    if (!userFetched.email) {
+        throw new AppError("User email not found", 404);
+    }
+    await bookingQuery.createBooking(bookingData);
+    await sendSysEmail("NEW_BOOKING", userFetched.email, bookingData);
+
 };
 
 export const getAllBookings = async () => {
@@ -38,7 +47,13 @@ export const getBookingByID = async (id) => {
 };
 
 export const updateBooking = async (id, data) => {
-  return await bookingQuery.updateBooking(id, data);
+    const res = await bookingQuery.updateBooking(id, data);
+    if (!res) {
+        throw new AppError("Booking not found", 404);
+    }
+    const dataTosend = { id: res.id, date: res.date, time: res.time, status: res.status };
+    const userFetched = await findUserByID(res.userId);
+    await sendSysEmail("BOOKING_UPDATED", userFetched.email, dataTosend);
 };
 
 export const deleteBooking = async (id) => {
@@ -58,5 +73,8 @@ export const changeBookingStatus = async (id, status) => {
     if (!updatedBooking) {
         throw new AppError("Booking not found", 404);
     }
+    const dataTosend = { id: updatedBooking.id, date: updatedBooking.date, time: updatedBooking.time, status: updatedBooking.status };
+    const userFetched = await findUserByID(updatedBooking.userId);
+    await sendSysEmail("BOOKING_UPDATED", userFetched.email, dataTosend);
     return updatedBooking;
 };
