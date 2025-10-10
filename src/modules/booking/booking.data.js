@@ -1,31 +1,42 @@
 import Booking from "../../../Database/models/booking.model.js";
+import User from "../../../Database/models/user.model.js";
 import { Op } from "sequelize";
-
+import { getPagination, getPagingData } from "../../utils/pagination.js";
 export const createBooking = async (data) => {
     return await Booking.create(data);
 };
 
-export const findAllBookings = async () => {
-    return await Booking.findAll({
+export const findAllBookings = async (page, limit) => {
+    const { limit: size, offset } = getPagination(page, limit);
+    const result = await Booking.findAndCountAll({
         include: [{
-            model: Booking.sequelize.models.User,
+            model: User,
             attributes: ['name', 'email'],
-    }],
-    order: [['createdAt', 'DESC']]
+        }],
+        order: [['createdAt', 'DESC']],
+        limit: size,
+        offset
     });
+    return getPagingData(result, page, limit);
 };
 
-export const findBookingsByUserID = async (userId) => {
-    return await Booking.findAll({ where: { userId } });
-};  
+export const findBookingsByUserID = async (userId, page, limit) => {
+    const { limit: size, offset } = getPagination(page, limit);
+    const result = await Booking.findAndCountAll({
+        where: { userId },
+        limit: size,
+        offset
+    });
+    return getPagingData(result, page, limit);
+};
 
 export const findBookingByID = async (id) => {
     return await Booking.findOne({ where: { id } });
 }
 
 export const updateBooking = async (id, data) => {
-  await Booking.update(data, { where: { id } });
-  return await findBookingByID(id);
+    await Booking.update(data, { where: { id } });
+    return await findBookingByID(id);
 };
 
 export const deleteBooking = async (id) => {
@@ -33,9 +44,12 @@ export const deleteBooking = async (id) => {
 };
 
 export const findUserActiveBookings = async (user, date, time) => {
-    return await Booking.findOne({ where: { userId: user, time, date, 
-        status: {
-        [Op.in]: ["active", "pending"]  
-      }
-    } });
+    return await Booking.findOne({
+        where: {
+            userId: user, time, date,
+            status: {
+                [Op.in]: ["active", "pending"]
+            }
+        }
+    });
 };

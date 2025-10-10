@@ -17,9 +17,9 @@ export const createBooking = async (req, res, next) => {
 
 export const getAllBookings = async (req, res, next) => {
     try {
-        const result = await bookingService.getAllBookings();
+        const { page, limit } = req.query;
+        const result = await bookingService.getAllBookings(page, limit);
         res.status(200).json({
-            msg: result.length + " bookings returned successfully",
             bookings: result
         });
     }
@@ -30,10 +30,10 @@ export const getAllBookings = async (req, res, next) => {
 
 export const getMyBookings = async (req, res, next) => {
     try {
+        const { page, limit } = req.query;
         const userId = req.user.id;
-        const result = await bookingService.getMyBookings(userId);
+        const result = await bookingService.getMyBookings(userId, page, limit);
         res.status(200).json({
-            msg: result.length + " bookings returned successfully",
             bookings: result
         });
     }

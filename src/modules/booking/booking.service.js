@@ -33,12 +33,12 @@ export const createBooking = async (user, data) => {
 
 };
 
-export const getAllBookings = async () => {
-    return await bookingQuery.findAllBookings();
+export const getAllBookings = async (page, limit) => {
+    return await bookingQuery.findAllBookings(page, limit);
 };
 
-export const getMyBookings = async (userId) => {
-    return await bookingQuery.findBookingsByUserID(userId);
+export const getMyBookings = async (userId, page, limit) => {
+    return await bookingQuery.findBookingsByUserID(userId, page, limit);
 };
 
 export const getBookingByID = async (id) => {
@@ -83,7 +83,7 @@ export const updateBooking = async (id, data) => {
         }
     }
     catch (err) {
-        console.error("Error sending email:", err);
+        throw new AppError("Error sending email: " + err.message, 500);
     }
 };
 
@@ -115,7 +115,7 @@ export const changeBookingStatus = async (id, status) => {
             await sendSysEmail("BOOKING_UPDATED", userFetched.email, dataTosend);
         }
     } catch (error) {
-        console.error("Error sending email:", error);
+        throw new AppError("Error sending email: " + error.message, 500);
     }
     return updatedBooking;
 };
